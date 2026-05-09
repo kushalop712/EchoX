@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EchoX — Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --color-bg: #050505;
+      --color-white: #ffffff;
+      --color-white-60: rgba(255,255,255,0.6);
+      --color-white-40: rgba(255,255,255,0.4);
+      --color-white-20: rgba(255,255,255,0.2);
+      --color-accent: #64b4ff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-white);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* Back link */
+    .back-link {
+      position: fixed;
+      top: 2rem;
+      left: 2rem;
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--color-white-40);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.3s ease;
+      z-index: 10;
+    }
+
+    .back-link:hover {
+      color: var(--color-white);
+    }
+
+    .back-arrow {
+      font-size: 1.2rem;
+      transition: transform 0.3s ease;
+    }
+
+    .back-link:hover .back-arrow {
+      transform: translateX(-4px);
+    }
+
+    /* Logo */
+    .checkout-logo {
+      text-decoration: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+    }
+
+    .logo-echo { color: var(--color-white); }
+    .logo-x { color: var(--color-accent); }
+
+    /* Checkout container */
+    .checkout-container {
+      width: 100%;
+      max-width: 520px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Order summary */
+    .order-summary {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .order-product-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .order-details {
+      flex: 1;
+    }
+
+    .order-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .order-variant {
+      font-size: 0.8rem;
+      color: var(--color-white-40);
+      margin-bottom: 0.3rem;
+    }
+
+    .order-price {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .order-original-price {
+      font-size: 0.85rem;
+      color: var(--color-white-20);
+      text-decoration: line-through;
+      margin-left: 0.5rem;
+    }
+
+    /* Section title */
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-icon {
+      font-size: 1.2rem;
+    }
+
+    /* Form */
+    .checkout-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-white-40);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .form-input {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--color-white);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      outline: none;
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+
+    .form-input::placeholder {
+      color: var(--color-white-20);
+    }
+
+    .form-input:focus {
+      border-color: var(--color-accent);
+      background: rgba(100,180,255,0.04);
+    }
+
+    /* Card number formatting */
+    .card-input-wrap {
+      position: relative;
+    }
+
+    .card-icons {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 0.4rem;
+      opacity: 0.4;
+      font-size: 0.85rem;
+      font-weight: 600;
+      pointer-events: none;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 0.5rem 0;
+    }
+
+    /* Pay button */
+    .pay-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #000;
+      background: var(--color-white);
+      border: none;
+      border-radius: 100px;
+      padding: 1.1rem 2rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+
+    .pay-btn:hover {
+      background: var(--color-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(100,180,255,0.3);
+    }
+
+    .pay-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Secure note */
+    .secure-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--color-white-20);
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    /* Success overlay */
+    .success-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5,5,5,0.95);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .success-overlay.show {
+      display: flex;
+    }
+
+    .success-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      animation: popIn 0.5s ease 0.2s both;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .success-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .success-msg {
+      font-size: 0.95rem;
+      color: var(--color-white-40);
+      margin-bottom: 2rem;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .success-btn {
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #000;
+      background: var(--color-white);
+      padding: 0.9rem 2.5rem;
+      border-radius: 100px;
+      transition: background 0.3s ease;
+    }
+
+    .success-btn:hover {
+      background: var(--color-accent);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .order-summary {
+        flex-direction: column;
+        text-align: center;
+      }
+      .back-link {
+        top: 1rem;
+        left: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">
+    <span class="back-arrow">←</span> Back to EchoX
+  </a>
+
+  <a href="index.html" class="checkout-logo">
+    <span class="logo-echo">Echo</span><span class="logo-x">X</span>
+  </a>
+
+  <div class="checkout-container">
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <img src="assets/start.jpg" alt="EchoX Headphones" class="order-product-img">
+      <div class="order-details">
+        <p class="order-name">EchoX — AI Headphones</p>
+        <p class="order-variant">Matte Black · Qty: 1</p>
+        <span class="order-price">₹24,000</span>
+        <span class="order-original-price">₹32,000</span>
+      </div>
+    </div>
+
+    <!-- Payment Form -->
+    <form class="checkout-form" id="checkoutForm">
+
+      <p class="section-title"><span class="section-icon">📦</span> Shipping Details</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="ship-first">First Name</label>
+          <input type="text" id="ship-first" class="form-input" placeholder="Kushal" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ship-last">Last Name</label>
+          <input type="text" id="ship-last" class="form-input" placeholder="Kumar" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="ship-email">Email</label>
+        <input type="email" id="ship-email" class="form-input" placeholder="you@email.com" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="ship-address">Address</label>
+        <input type="text" id="ship-address" class="form-input" placeholder="123 Main Street, Bengaluru" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="ship-city">City</label>
+          <input type="text" id="ship-city" class="form-input" placeholder="Bengaluru" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ship-pin">PIN Code</label>
+          <input type="text" id="ship-pin" class="form-input" placeholder="560001" maxlength="6" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="ship-phone">Phone</label>
+        <input type="tel" id="ship-phone" class="form-input" placeholder="+91 98765 43210" required>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="section-title"><span class="section-icon">💳</span> Card Details</p>
+
+      <div class="form-group">
+        <label class="form-label" for="card-name">Name on Card</label>
+        <input type="text" id="card-name" class="form-input" placeholder="KUSHAL KUMAR" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="card-number">Card Number</label>
+        <div class="card-input-wrap">
+          <input type="text" id="card-number" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19" required>
+          <div class="card-icons">VISA MC</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="card-expiry">Expiry Date</label>
+          <input type="text" id="card-expiry" class="form-input" placeholder="MM / YY" maxlength="7" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="card-cvv">CVV</label>
+          <input type="password" id="card-cvv" class="form-input" placeholder="•••" maxlength="4" required>
+        </div>
+      </div>
+
+      <button type="submit" class="pay-btn" id="payBtn">Pay ₹24,000</button>
+
+      <p class="secure-note">🔒 Secured with 256-bit SSL encryption</p>
+    </form>
+
+  </div>
+
+  <!-- Success Overlay -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-icon">✅</div>
+    <h2 class="success-title">Payment Successful!</h2>
+    <p class="success-msg">Your EchoX headphones are on the way. You'll receive a confirmation email shortly.</p>
+    <a href="index.html" class="success-btn">Back to Home</a>
+  </div>
+
+  <script>
+    // Card number formatting (add spaces)
+    const cardInput = document.getElementById('card-number');
+    cardInput.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/\D/g, '');
+      val = val.replace(/(\d{4})(?=\d)/g, '$1 ');
+      e.target.value = val;
+    });
+
+    // Expiry formatting
+    const expiryInput = document.getElementById('card-expiry');
+    expiryInput.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/\D/g, '');
+      if (val.length >= 2) {
+        val = val.substring(0, 2) + ' / ' + val.substring(2, 4);
+      }
+      e.target.value = val;
+    });
+
+    // Form submission
+    const form = document.getElementById('checkoutForm');
+    const successOverlay = document.getElementById('successOverlay');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('payBtn');
+      btn.textContent = 'Processing...';
+      btn.style.opacity = '0.6';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        successOverlay.classList.add('show');
+      }, 1500);
+    });
+  </script>
+
+</body>
+</html>
