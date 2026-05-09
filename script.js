@@ -36,7 +36,7 @@
 
   // ---- Intersection Observer for scroll-reveal ----
   const revealSections = document.querySelectorAll(
-    '.feature-section, .ai-section, .specs-section, .gesture-section'
+    '.feature-section, .ai-section, .specs-section, .gesture-section, .buy-section, .contact-section'
   );
 
   const revealObserver = new IntersectionObserver(
@@ -231,6 +231,77 @@
       });
       ticking = true;
     }
+  });
+
+
+  // ---- Active nav link tracking on scroll ----
+  const navLinksAll = document.querySelectorAll('.nav-link');
+  const sectionTargets = [
+    { id: 'top', link: document.getElementById('nav-home') },
+    { id: 'specs', link: document.getElementById('nav-products') },
+    { id: 'contact', link: document.getElementById('nav-contact') },
+  ];
+
+  function updateActiveNav() {
+    const scrollY = window.scrollY + 200;
+
+    // Find which section we're in
+    let activeLink = sectionTargets[0].link; // default to Home
+
+    sectionTargets.forEach(({ id, link }) => {
+      const section = document.getElementById(id);
+      if (section && section.offsetTop <= scrollY) {
+        activeLink = link;
+      }
+    });
+
+    navLinksAll.forEach((l) => l.classList.remove('active'));
+    if (activeLink) activeLink.classList.add('active');
+  }
+
+  window.addEventListener('scroll', updateActiveNav);
+
+
+  // ---- Contact form submission ----
+  const contactForm = document.getElementById('contactForm');
+  const formSuccess = document.getElementById('formSuccess');
+
+  if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      // Show success message
+      formSuccess.classList.add('show');
+
+      // Reset form
+      contactForm.reset();
+
+      // Hide success after 5 seconds
+      setTimeout(() => {
+        formSuccess.classList.remove('show');
+      }, 5000);
+    });
+  }
+
+
+  // ---- Smooth scroll with navbar offset ----
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener('click', (e) => {
+      const targetId = anchor.getAttribute('href');
+      if (targetId === '#') return;
+
+      const target = document.querySelector(targetId);
+      if (target) {
+        e.preventDefault();
+        const navHeight = navbar.offsetHeight;
+        const targetPos = target.offsetTop - navHeight;
+
+        window.scrollTo({
+          top: targetPos,
+          behavior: 'smooth'
+        });
+      }
+    });
   });
 
 })();
